@@ -1,10 +1,11 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { DownloadResumeButton } from '@/components/DownloadResumeButton';
 import connectDB from '@/lib/mongodb';
 import Home from '@/lib/models/Home';
+import { normalizeImageUrl } from '@/lib/utils';
+import { SafeImage } from '@/components/ui/safe-image';
 
 async function getHomeData() {
   try {
@@ -74,12 +75,14 @@ export default async function HomeSection() {
             <div className="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 animate-slide-up">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/5 rounded-full blur-3xl"></div>
               <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-primary/20 shadow-2xl">
-                <Image
-                  src={homeData.profileImage || '/placeholder-profile.svg'}
+                <SafeImage
+                  src={normalizeImageUrl(homeData.profileImage)}
                   alt={homeData.name}
                   fill
                   className="object-cover"
                   priority
+                  unoptimized={homeData.profileImage?.startsWith('http') || false}
+                  placeholder="/placeholder-profile.svg"
                 />
               </div>
             </div>

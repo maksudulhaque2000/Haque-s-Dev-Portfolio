@@ -1,8 +1,9 @@
-import Image from 'next/image';
 import { MapPin } from 'lucide-react';
 import connectDB from '@/lib/mongodb';
 import About from '@/lib/models/About';
 import { DownloadResumeButton } from '@/components/DownloadResumeButton';
+import { normalizeImageUrl } from '@/lib/utils';
+import { SafeImage } from '@/components/ui/safe-image';
 
 async function getAboutData() {
   try {
@@ -44,12 +45,14 @@ export default async function AboutSection() {
           {/* Image */}
           <div className="lg:col-span-2 flex justify-center lg:justify-start">
             <div className="relative w-full max-w-md h-[400px] lg:h-[500px] rounded-lg overflow-hidden shadow-2xl">
-              <Image
-                src={aboutData.image || '/placeholder-about.svg'}
+              <SafeImage
+                src={normalizeImageUrl(aboutData.image) || '/placeholder-about.svg'}
                 alt="About Me"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 40vw"
+                unoptimized={aboutData.image?.startsWith('http') || false}
+                placeholder="/placeholder-about.svg"
               />
             </div>
           </div>

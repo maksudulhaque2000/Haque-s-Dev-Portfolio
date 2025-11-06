@@ -20,9 +20,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Save, Plus, Trash2, Upload, Edit2 } from "lucide-react";
-import Image from "next/image";
+import { Save, Plus, Trash2 } from "lucide-react";
 import { ImageCropper } from "@/components/ui/image-cropper";
+import { DragDropImageUpload } from "@/components/ui/drag-drop-image-upload";
 
 export default function AboutManagementPage() {
   const [loading, setLoading] = useState(true);
@@ -75,10 +75,7 @@ export default function AboutManagementPage() {
       .catch(() => setLoading(false));
   }, []);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const handleFileSelect = (file: File) => {
     const reader = new FileReader();
     reader.onload = () => {
       setImageToCrop(reader.result as string);
@@ -224,44 +221,19 @@ export default function AboutManagementPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <Label>About Image</Label>
-              <div className="mt-2 space-y-4">
-                {formData.image && (
-                  <div className="relative w-full max-w-md h-[400px] rounded-lg overflow-hidden border-2 border-border">
-                    <Image
-                      src={formData.image}
-                      alt="About"
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 400px"
-                    />
-                  </div>
-                )}
-                <div className="flex gap-2">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileUpload}
-                    className="w-auto"
-                    id="image-upload"
-                  />
-                  {formData.image && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        setImageToCrop(formData.image);
-                        setCropperOpen(true);
-                      }}
-                    >
-                      <Edit2 className="mr-2 h-4 w-4" />
-                      Edit Image
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </div>
+            <DragDropImageUpload
+              label="About Image"
+              onFileSelect={handleFileSelect}
+              currentImage={formData.image}
+              onEditClick={() => {
+                if (formData.image) {
+                  setImageToCrop(formData.image);
+                  setCropperOpen(true);
+                }
+              }}
+              previewClassName="w-full max-w-md h-[400px] rounded-lg"
+              showEditButton={!!formData.image}
+            />
 
             <div>
               <Label htmlFor="description">Description</Label>

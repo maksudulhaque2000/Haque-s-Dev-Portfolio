@@ -7,9 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Save, Upload, Edit2 } from 'lucide-react';
-import Image from 'next/image';
+import { Save } from 'lucide-react';
 import { ImageCropper } from '@/components/ui/image-cropper';
+import { DragDropImageUpload } from '@/components/ui/drag-drop-image-upload';
 
 export default function HomeManagementPage() {
   const [loading, setLoading] = useState(true);
@@ -36,10 +36,7 @@ export default function HomeManagementPage() {
       .catch(() => setLoading(false));
   }, []);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const handleFileSelect = (file: File) => {
     const reader = new FileReader();
     reader.onload = () => {
       setImageToCrop(reader.result as string);
@@ -112,44 +109,19 @@ export default function HomeManagementPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <Label>Profile Image</Label>
-              <div className="mt-2 space-y-4">
-                {formData.profileImage && (
-                  <div className="relative w-48 h-48 rounded-full overflow-hidden border-2 border-border">
-                    <Image
-                      src={formData.profileImage}
-                      alt="Profile"
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 192px, 192px"
-                    />
-                  </div>
-                )}
-                <div className="flex items-center gap-4">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileUpload}
-                    className="w-auto"
-                    id="profile-image-upload"
-                  />
-                  {formData.profileImage && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        setImageToCrop(formData.profileImage);
-                        setCropperOpen(true);
-                      }}
-                    >
-                      <Edit2 className="mr-2 h-4 w-4" />
-                      Edit Image
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </div>
+            <DragDropImageUpload
+              label="Profile Image"
+              onFileSelect={handleFileSelect}
+              currentImage={formData.profileImage}
+              onEditClick={() => {
+                if (formData.profileImage) {
+                  setImageToCrop(formData.profileImage);
+                  setCropperOpen(true);
+                }
+              }}
+              previewClassName="w-48 h-48 rounded-full"
+              showEditButton={!!formData.profileImage}
+            />
 
             <div>
               <Label htmlFor="name">Name</Label>
